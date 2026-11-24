@@ -2,7 +2,12 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#7c3aed" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TI Sem 1 UVERS" />
   <title>Teknik Informatika Semester 1 – Universitas Universal</title>
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <script>
@@ -454,10 +459,10 @@
             </button>
           </div>
 
-          <!-- Ambient Audio Dropdown Popover -->
+          <!-- Ambient Audio Dropdown Popover (Desktop) / Floating Bottom Sheet (Android & Mobile) -->
           <div
             id="ambient-popover"
-            class="hidden absolute right-0 mt-2 w-72 sm:w-80 rounded-2xl border border-[var(--card-border)] glass-surface shadow-2xl p-4 space-y-3 z-50"
+            class="hidden fixed inset-x-3 bottom-20 sm:bottom-auto sm:inset-x-auto sm:absolute sm:right-0 sm:mt-2 sm:w-80 rounded-2xl border border-[var(--card-border)] glass-surface shadow-2xl p-4 space-y-3 z-50"
             role="dialog"
             aria-label="Pengaturan Suara Latar Fokus"
           >
@@ -466,7 +471,15 @@
                 <p class="text-xs font-bold text-[var(--foreground)] flex items-center gap-1.5">🎧 Suara Latar Fokus</p>
                 <p class="text-[10px] text-[var(--muted-foreground)]">Web Audio API • Ringan &amp; Jalan Offline</p>
               </div>
-              <span id="ambient-status-pill" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-[var(--secondary)] text-[var(--muted-foreground)]">OFF</span>
+              <div class="flex items-center gap-1.5">
+                <span id="ambient-status-pill" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-[var(--secondary)] text-[var(--muted-foreground)]">OFF</span>
+                <button
+                  id="ambient-popover-close-btn"
+                  type="button"
+                  class="sm:hidden w-6 h-6 rounded-lg bg-[var(--secondary)] hover:bg-[var(--card)] text-xs font-bold text-[var(--muted-foreground)] flex items-center justify-center cursor-pointer"
+                  aria-label="Tutup panel suara fokus"
+                >✕</button>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 gap-1.5 text-xs">
@@ -1135,14 +1148,15 @@
     </div>
   </footer>
 
-  <!-- Floating Mobile Bottom Navigation Bar -->
-  <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-[var(--card-border)] glass-surface px-2 py-1.5 shadow-2xl" aria-label="Navigasi cepat ponsel">
-    <div class="grid grid-cols-5 gap-1 text-[10px] font-semibold">
+  <!-- Floating Mobile & Android Bottom Navigation Bar -->
+  <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 inset-x-0 z-40 border-t border-[var(--card-border)] glass-surface px-1.5 pt-1.5 pb-[max(0.45rem,env(safe-area-inset-bottom))] shadow-2xl" aria-label="Navigasi cepat ponsel dan Android">
+    <div class="grid grid-cols-6 gap-0.5 text-[10px] font-semibold">
       <button type="button" data-beranda-jump="materi" class="flex flex-col items-center justify-center py-1 rounded-xl hover:bg-[var(--secondary)] text-[var(--foreground)] cursor-pointer"><span class="text-sm">📚</span><span>Materi</span></button>
+      <button type="button" data-beranda-jump="rumus" class="flex flex-col items-center justify-center py-1 rounded-xl hover:bg-[var(--secondary)] text-[var(--foreground)] cursor-pointer"><span class="text-sm">📐</span><span>Rumus</span></button>
       <button type="button" data-beranda-jump="video" class="flex flex-col items-center justify-center py-1 rounded-xl hover:bg-[var(--secondary)] text-[var(--foreground)] cursor-pointer"><span class="text-sm">🎬</span><span>Video</span></button>
-      <button type="button" data-beranda-jump="sandbox" class="flex flex-col items-center justify-center py-1 rounded-xl hover:bg-[var(--secondary)] text-[var(--foreground)] cursor-pointer"><span class="text-sm">🧮</span><span>Lab</span></button>
-      <button type="button" data-beranda-jump="flashcards" class="flex flex-col items-center justify-center py-1 rounded-xl hover:bg-[var(--secondary)] text-[var(--foreground)] cursor-pointer"><span class="text-sm">🃏</span><span>Kartu</span></button>
       <button type="button" data-beranda-jump="quiz" class="flex flex-col items-center justify-center py-1 rounded-xl hover:bg-[var(--secondary)] text-[var(--foreground)] cursor-pointer"><span class="text-sm">🎯</span><span>Quiz</span></button>
+      <button id="mobile-nav-pomo-btn" type="button" data-open-pomo-page="true" class="flex flex-col items-center justify-center py-1 rounded-xl bg-rose-500/10 text-rose-700 dark:text-rose-300 hover:bg-rose-500/20 cursor-pointer"><span class="text-sm">🍅</span><span id="mobile-nav-pomo-badge" class="tabular-nums">Pomo</span></button>
+      <button id="mobile-nav-ambient-btn" type="button" class="flex flex-col items-center justify-center py-1 rounded-xl hover:bg-[var(--secondary)] text-[var(--foreground)] transition-colors cursor-pointer" aria-label="Buka suara latar fokus"><span id="mobile-nav-ambient-icon" class="text-sm">🎧</span><span id="mobile-nav-ambient-label">Suara</span></button>
     </div>
   </nav>
 
@@ -10408,6 +10422,8 @@ if idx != -1:
         document.getElementById("pomo-toggle-btn").textContent = pomoRunning ? "⏸" : "▶";
         document.getElementById("pomo-mode-btn").textContent = pomoMode === "focus" ? "🍅" : "☕";
         document.getElementById("pomo-sessions-label").textContent = `${state.pomoSessions} Sesi`;
+        const mobilePomoBadge = document.getElementById("mobile-nav-pomo-badge");
+        if (mobilePomoBadge) mobilePomoBadge.textContent = pomoRunning ? clockText : "Pomo";
 
         const pageDisp = document.getElementById("pomo-page-display");
         if (pageDisp) {
@@ -11301,6 +11317,18 @@ if idx != -1:
         if (pomoVolSlider) pomoVolSlider.value = String(ambientState.volume);
         if (pomoVolLabel) pomoVolLabel.textContent = `${ambientState.volume}%`;
 
+        // Sync Android / Mobile Bottom Nav Suara button
+        const mobileAmbBtn = document.getElementById("mobile-nav-ambient-btn");
+        const mobileAmbIcon = document.getElementById("mobile-nav-ambient-icon");
+        const mobileAmbLabel = document.getElementById("mobile-nav-ambient-label");
+        if (mobileAmbIcon) mobileAmbIcon.textContent = ambientState.playing ? meta.icon : "🎧";
+        if (mobileAmbLabel) mobileAmbLabel.textContent = ambientState.playing ? meta.label : "Suara";
+        if (mobileAmbBtn) {
+          mobileAmbBtn.classList.toggle("bg-emerald-500/15", ambientState.playing);
+          mobileAmbBtn.classList.toggle("text-emerald-700", ambientState.playing);
+          mobileAmbBtn.classList.toggle("dark:text-emerald-300", ambientState.playing);
+        }
+
         document.querySelectorAll(".ambient-preset-btn").forEach((btn) => {
           const active = btn.getAttribute("data-ambient-preset") === ambientState.preset;
           btn.classList.toggle("border-[var(--primary)]", active);
@@ -11367,14 +11395,25 @@ if idx != -1:
         if (pomoToggle) pomoToggle.addEventListener("click", () => setAmbientPlaying(!ambientState.playing));
 
         if (popoverBtn && popover) {
-          popoverBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
+          const togglePopover = (e) => {
+            if (e) e.stopPropagation();
             const isHidden = popover.classList.toggle("hidden");
             popoverBtn.setAttribute("aria-expanded", String(!isHidden));
-          });
+          };
+          popoverBtn.addEventListener("click", togglePopover);
+          const mobileAmbBtn = document.getElementById("mobile-nav-ambient-btn");
+          if (mobileAmbBtn) mobileAmbBtn.addEventListener("click", togglePopover);
+          const popoverCloseBtn = document.getElementById("ambient-popover-close-btn");
+          if (popoverCloseBtn) {
+            popoverCloseBtn.addEventListener("click", () => {
+              popover.classList.add("hidden");
+              popoverBtn.setAttribute("aria-expanded", "false");
+            });
+          }
           document.addEventListener("click", (e) => {
             const wrap = document.getElementById("ambient-audio-wrap");
-            if (wrap && !wrap.contains(e.target) && !popover.classList.contains("hidden")) {
+            const clickedMobileBtn = mobileAmbBtn && mobileAmbBtn.contains(e.target);
+            if (wrap && !wrap.contains(e.target) && !clickedMobileBtn && !popover.classList.contains("hidden")) {
               popover.classList.add("hidden");
               popoverBtn.setAttribute("aria-expanded", "false");
             }
